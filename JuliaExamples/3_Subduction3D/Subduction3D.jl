@@ -57,4 +57,4 @@ slab   = Phase(Name="slab",  ID=2,eta=2e23,rho=3280)
 add_phase!(model, mantle, slab, crust)
 
 # 4. Run the simulation 
-run_lamem(model, 1)       # run on 8 cores (if possible)            
+run_lamem(model, 4)       # run on 8 cores (if possible)            
