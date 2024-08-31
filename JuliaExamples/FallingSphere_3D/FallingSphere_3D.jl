@@ -1,4 +1,6 @@
 # First example of how to use LaMEM
+# You can run this from the julia REPL with: 
+# julia> include("FallingSphere_3D.jl")
 
 # Load packages: 
 using LaMEM, GeophysicalModelGenerator, Plots
