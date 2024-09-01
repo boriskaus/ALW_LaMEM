@@ -15,9 +15,9 @@ model = Model(      Grid(   x   = [-2000.,2000.],
 
                     Scaling(GEO_units(  temperature     = 1000,
                                         stress          = 1e9Pa,
-                                        length          = 1km,
+                                        length          = 1000km,
                                         viscosity       = 1e20Pa*s) ),
-                                        
+
                     Time(               time_end  = 2000.0,
                                         dt        = 0.001,
                                         dt_min    = 0.000001,
@@ -33,7 +33,8 @@ model.Time = Time(  time_end  = 2000.0,
     dt_min    = 0.000001,
     dt_max    = 0.1,
     nstep_max = 400,
-    nstep_out = 10
+    nstep_out = 10,
+    nstep_rdb = 1000
 )
 
 # Set solution parameters
@@ -41,10 +42,10 @@ model.SolutionParams = SolutionParams(  shear_heat_eff = 1.0,
                                         Adiabatic_Heat = 1.0,
                                         act_temp_diff  = 1,
                                         eta_min   = 5e18,
-                                        eta_ref   = 1e20,
+                                        eta_ref   = 1e19,
                                         eta_max   = 1e25,
                                         min_cohes = 1e3
-)
+                                        )
 
 # Set surface topography
 model.FreeSurface = FreeSurface(    surf_use        = 1,                # free surface activation flag
@@ -75,9 +76,7 @@ model.Grid.Phases[model.Grid.Grid.Z .> 0.0 ] .= 5;
 
 # Left ocanic plate:
 add_box!(model;  xlim    = (-2000.0, 0.0), 
-                ylim    = (model.Grid.coord_y...,), 
                 zlim    = (-660.0, 0.0),
-                Origin  = nothing, StrikeAngle=0, DipAngle=0,
                 phase   = LithosphericPhases(Layers=[20 80], Phases=[1 2 0] ),
                 T       = SpreadingRateTemp(    Tsurface    = Tair,
                                                 Tmantle     = Tmantle,
@@ -85,13 +84,12 @@ add_box!(model;  xlim    = (-2000.0, 0.0),
                                                 SpreadingVel= 0.5,
                                                 AgeRidge    = 0.01;
                                                 maxAge      = 80.0      ) )
-# Add right oceanic plate:
+
+# Add right oceanic plate with thernak structure of spreaduing oceanic plate:
 add_box!(model;  xlim    = (1500, 2000), 
-                ylim    = (model.Grid.coord_y..., ), 
-                zlim    = (-660.0, 0.0),
-                Origin  = nothing, StrikeAngle=0, DipAngle=0,
-                phase   = LithosphericPhases(Layers=[20 80], Phases=[1 2 0] ),
-                T       = SpreadingRateTemp(    Tsurface    = Tair,
+                 zlim    = (-660.0, 0.0),
+                 phase   = LithosphericPhases(Layers=[20 80], Phases=[1 2 0] ),
+                 T       = SpreadingRateTemp(   Tsurface    = Tair,
                                                 Tmantle     = Tmantle,
                                                 MORside     = "right",
                                                 SpreadingVel= 0.5,
@@ -100,9 +98,7 @@ add_box!(model;  xlim    = (1500, 2000),
                                     
 # Add overriding plate margin
 add_box!(model;  xlim    = (0.0, 400.0), 
-                ylim    = (model.Grid.coord_y[1], model.Grid.coord_y[2]), 
                 zlim    = (-660.0, 0.0),
-                Origin  = nothing, StrikeAngle=0, DipAngle=0,
                 phase   = LithosphericPhases(Layers=[25 90], Phases=[3 4 0] ),
                 T       = HalfspaceCoolingTemp(     Tsurface    = Tair,
                                                     Tmantle     = Tmantle,
@@ -110,19 +106,16 @@ add_box!(model;  xlim    = (0.0, 400.0),
 
                                                     
 # Overriding plate craton
-add_box!(model;  xlim    = (400.0, 1500.0), 
-                ylim    = (model.Grid.coord_y...,), 
+add_box!(model; xlim    = (400.0, 1500.0), 
                 zlim    = (-660.0, 0.0),
-                Origin  = nothing, StrikeAngle=0, DipAngle=0,
                 phase   = LithosphericPhases(Layers=[35 100], Phases=[3 4 0] ),
                 T       = HalfspaceCoolingTemp(     Tsurface    = Tair,
                                                     Tmantle     = Tmantle,
                                                     Age         = 120      ) )
 #   Add pre-subducted slab                                                  
-add_box!(model;  xlim    = (0.0, 300), 
-                ylim    = (model.Grid.coord_y...,), 
+add_box!(model; xlim    = (0.0, 300), 
                 zlim    = (-660.0, 0.0),
-                Origin  = nothing, StrikeAngle=0, DipAngle=30,
+                DipAngle=30,
                 phase   = LithosphericPhases(Layers=[30 80], Phases=[1 2 0], Tlab=1250 ),
                 T       = HalfspaceCoolingTemp(     Tsurface    = Tair,
                                                     Tmantle     = Tmantle,
@@ -198,8 +191,8 @@ air         = Phase(    Name        = "air",
                         rho         = 50.0,                                             # density [kg/m3]                                           # coeff. of thermal expansion [1/K]
                         eta         = 1e19,
                         G           = 5e10,                                             # elastic shear module [MPa]
-                        k           = 100,                                              # conductivity
-                        Cp          = 1e6,                                              # heat capacity
+                        k           = 100,                                              # conductivity (artificially high to keep T constant)
+                        Cp          = 1e6,                                              # heat capacity (artificially high to keep T constant)
                         ch          = 10e6,                                             # cohesion [MPa]
                         fr          = 0.0,                                              # friction angle	
                     )
@@ -220,37 +213,16 @@ add_softening!( model,softening)
 
 
 # Set solver options
-model.Solver = Solver(  SolverType      = "multigrid",
-                        MGLevels        = 3,
-                        MGCoarseSolver 	= "mumps",
-                        PETSc_options   = [ "-snes_ksp_ew",
-                                            "-snes_ksp_ew_rtolmax 1e-4",
-                                            "-snes_rtol 5e-3",			
+model.Solver = Solver(  SolverType      = "direct",
+                        PETSc_options   = [ "-snes_rtol 1e-3",			
                                             "-snes_atol 1e-4",
-                                            "-snes_max_it 200",
                                             "-snes_PicardSwitchToNewton_rtol 1e-3", 
-                                            "-snes_NewtonSwitchToPicard_it 20",
-                                            "-js_ksp_type fgmres",
-                                            "-js_ksp_max_it 20",
-                                            "-js_ksp_atol 1e-8",
-                                            "-js_ksp_rtol 1e-4",
-                                            "-snes_linesearch_type l2",
-                                            "-snes_linesearch_maxstep 10",
-                                            "-da_refine_y 1"
+                                            #"-js_ksp_type fgmres",
+                                            #"-js_ksp_max_it 50",
+                                            #"-js_ksp_atol 1e-8",
+                                            #"-js_ksp_rtol 1e-4",
                                         ]
                     )
 
-if Sys.iswindows()
-    model.Solver.MGCoarseSolver = "direct" 
-end
 
-try testing == true 
-    # if we run this as part of the test suite, use fewer timesteps
-    if !Sys.iswindows()
-        run_lamem(model, 8, "-nstep_max 2 -nstep_out 1")       
-    else
-        run_lamem(model, 1, "-nstep_max 2 -nstep_out 1")       
-    end
-catch
-    run_lamem(model, 8)       
-end
+run_lamem(model, 1)       
