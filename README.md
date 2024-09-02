@@ -2,14 +2,14 @@
 
 This repository contains material and scripts for the mini tutorial on LaMEM as part of the 2024 Ada Lovelace workshop on Modelling Mantle and Lithosphere Dynamics.
 
-### Required software
+### a. Required software
 Participants will have to install the following software:
 - [VSCode](https://code.visualstudio.com/download) This is the most widely used coding environment worldwide and provides support for julia. Also add the julia extension (click on the left side to add extensions).
 - [Julia](https://julialang.org) We will use julia to create model setups and run LaMEM. The easiest way to install julia these days is through [juliaup](https://github.com/JuliaLang/juliaup). Once you did that, you can install the `LaMEM`, `GeophysicalModelGenerator` and `Plots` packages. We currently use julia 1.10
 - [Paraview](https://www.paraview.org) - This is a very powerful visualisation tool. Any version will do.
 
 
-### Topics
+### b. Topics
 We will use the julia interface to LaMEM - called [LaMEM.jl](https://github.com/JuliaGeodynamics/LaMEM.jl) in this workshop as it is by far the easiest way to setup LaMEM models. 
 
 #### 1. Julia intro
@@ -26,3 +26,13 @@ We will use the julia interface to LaMEM - called [LaMEM.jl](https://github.com/
 
 #### 5. Fold and thrust belt
 [Fold  and Thrust](JuliaExamples/4_FoldThrust/fold_and_thrust.jl) - fold and thrust belts are a nice example of how brittle layers may slide overa  detachment horizon and cause both folding and faulting. In this example, we reproduce this using visco-elasto-viscoplastic rheologies and an (internal) free surface
+
+### c. Additional help
+You can find additional material by looking at the
+- [documentation of LaMEM.jl](https://juliageodynamics.github.io/LaMEM.jl/dev/)
+- [tests of LaMEM.jl](https://github.com/JuliaGeodynamics/LaMEM.jl/tree/main/test) - these tests are run every time a new commit is made to the LaMEM repository so are up to date.
+- [main input file of LaMEM](https://github.com/UniMainzGeo/LaMEM/blob/master/input_models/input/lamem_input.dat) which lists all available options. We try to keep `LaMEM.jl` up to date with this.
+- [CHEES2 workshop material](https://github.com/boriskaus/CHEESE2_GeodynamicsWorkshop/tree/main) this wqs a workshop held in spring 2024 and contains some usful material
+- [Heidelberg LaMEM course](https://github.com/NicolasRiel/Heidelberg_LaMEM_course) - a shortcourse at the university of Heidelberg held by Nicolas Riel (for BSc students). Note that we have sligthly updated the names of some functions in GeophysicalModelGenerator since that time so you may have to make a few modifications to the scripts
+
+Finally, if you find mistakes or errors, please don't be shy to leave in [issue](https://github.com/JuliaGeodynamics/LaMEM.jl/issues), or perhaps even fix it yourself and make a pull request. The code will only get better with everyone's help!
