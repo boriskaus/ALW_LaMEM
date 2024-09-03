@@ -13,15 +13,15 @@ using LaMEM, GeophysicalModelGenerator
 # Note that a range of default values will be set, depending on the parameters you specify.
 model = Model(  
                 ## Define the grid
-                Grid(   nel=(128,32,64), 
-                        #nel=(64,16,32),         # reduce resolution for CI
+                Grid(   #nel=(128,32,64),       # higher resolution
+                        nel=(64,32,64),         # medium resolution
                         x=[-3960, 500], y=[0,2640], z=[-660 ,0]), 
                 
                 ## No slip lower boundary; the rest is free slip
                 BoundaryConditions(noslip = [0, 0, 0, 0, 1, 0]), 
                 
                 ## We use a multigrid solver with 4 levels:
-                Solver(SolverType="multigrid", MGLevels=4, MGCoarseSolver="mumps",  
+                Solver(SolverType="multigrid", MGLevels=3, MGCoarseSolver="mumps",  
                         PETSc_options=[ "-snes_type ksponly", 
                                         "-js_ksp_rtol 1e-3", 
                                         "-js_ksp_atol 1e-4", 
