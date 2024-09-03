@@ -61,8 +61,12 @@ Tair                    = 20.0;
 Tmantle                 = 1280.0;
 model.Grid.Temp        .= Tmantle;              # set mantle temperature (without adiabat at first)
 
-# add single plate using add_box!
+# get coordinate matrices
+X                                   = model.Grid.Grid.X;
+Y                                   = model.Grid.Grid.Y;
+Z                                   = model.Grid.Grid.Z;
 
+# add single plate using add_box!
 # Add lithosphere and mantle, including mantle adiabat
 add_box!(model; xlim    = model.Grid.coord_x, 
                 zlim    = (-660.0, 0.0),
