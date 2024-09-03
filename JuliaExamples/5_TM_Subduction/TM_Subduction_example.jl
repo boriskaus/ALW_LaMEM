@@ -7,7 +7,7 @@ model = Model(      Grid(   x   = [-2000.,2000.],
                         ),
                     
                     ## Output filename
-                    Output(out_file_name="TMSubduction_2D", out_dir="TMSubduction_2D"),        
+                    Output(out_file_name="TMSubduction_2D", out_dir="TMSubduction_2D", out_phase=1),        
 
                     BoundaryConditions( temp_bot        = 1565.0,
                                         temp_top        = 20.0,
@@ -32,7 +32,7 @@ model.Time = Time(  time_end  = 2000.0,
     dt        = 0.001,
     dt_min    = 0.000001,
     dt_max    = 0.1,
-    nstep_max = 400,
+    nstep_max = 150,
     nstep_out = 10,
     nstep_rdb = 1000
 )
